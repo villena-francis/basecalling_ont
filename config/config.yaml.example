@@ -1,0 +1,54 @@
+# Tool paths
+dorado_bin: "/path/to/dorado/bin/dorado"
+
+# Samples hierarchical structure
+samples:
+  PATIENT1:
+    PATIENT1_normal:
+      pod5: "/path/to/patient1/normal/pod5/"
+      colour: "#D40000"
+      normal: True
+    PATIENT1_tumor:
+      pod5: "/path/to/patient1/tumor/pod5/"
+      colour: "#3366CC"
+  PATIENT2:
+    PATIENT2_normal:
+      pod5: "/path/to/patient2/normal/pod5/"
+      colour: "#D40000"
+      normal: True
+    PATIENT2_before_treatment:
+      pod5: "/path/to/patient2/before_treatment/pod5/"
+      colour: "#3366CC"
+    PATIENT2_after_treatment:
+      pod5: "/path/to/patient2/after_treatment/pod5/"
+      colour: "#009E73"
+  CELL_LINES:
+    wild_type:
+      pod5: "/path/to/celllines/wildtype/pod5/"
+      colour: "#359B73"
+    knockout:
+      pod5: "/path/to/celllines/knockout/pod5/"
+      colour: "#2271B2"
+    resistant:
+      pod5: "/path/to/celllines/resistant/pod5/"
+      colour: "#3DB7E9"
+
+# Resource specifications for different steps
+resources:
+  default:
+    partition: main
+    threads: 2
+    mem_mb: 8000
+    runtime: 30
+    slurm_extra: ""
+    params_extra: ""
+  basecall_dorado:
+    partition: gpu
+    threads: 24
+    mem_mb: 128000
+    runtime: 4320
+    slurm_extra: "--gres=gpu:A100:1"
+    params_model: "sup,5mCG_5hmCG"
+    params_extra: "--recursive"
+  nanoplot:
+    runtime: 45
