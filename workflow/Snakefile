@@ -3,6 +3,7 @@ import os
 
 configfile: "config/config.yaml"
 
+
 def get_resource(rule, resource):
     try:
         return config["resources"][rule][resource]
@@ -14,13 +15,13 @@ def input_main(wc):
     o = []
     for patient in config["samples"]:
         for sampleid in config["samples"][patient]:
-			o.append(f"results/nanoplot/{patient}/{sampleid}.html")
+            o.append(f"results/nanoplot/{patient}/{sampleid}/NanoPlot-report.html")
     return o
 
 rule main:
     input:
         input_main
-		
+        
 
 rule basecall_dorado:
     input:
@@ -40,11 +41,11 @@ rule basecall_dorado:
         mem_mb=get_resource("basecall_dorado", "mem_mb"),
         runtime=get_resource("basecall_dorado", "runtime"),
         slurm_partition=get_resource("basecall_dorado", "partition"),
-        slurm_extra=get_resource("basecall_dorado", "slurm_extra"),
+        gres=get_resource("basecall_dorado", "gres"),
     shell:
         """
         {params.bin} basecaller {params.model} {input} {params.extra} > {output} 2> {log}
-    """
+        """
 
 
 rule summary_dorado:
@@ -69,11 +70,13 @@ rule summary_dorado:
         {params.bin} summary {input} >> {output} 2> {log}
     """
 
+
 rule nanoplot:
     input:
     	"results/summary_dorado/{patient}/{sampleid}.txt",
     output:
-        directory("results/nanoplot/{patient}/{sampleid}"),
+        folder = directory("results/nanoplot/{patient}/{sampleid}"),
+        report = "results/nanoplot/{patient}/{sampleid}/NanoPlot-report.html"
     log:
         "logs/nanoplot/{patient}/{sampleid}.log",
     benchmark:
@@ -88,5 +91,5 @@ rule nanoplot:
         slurm_extra=get_resource("nanoplot", "slurm_extra"),
     shell:
         """
-        NanoPlot -t {threads} --summary {input} -o {output} > {log} 2>&1
+        NanoPlot -t {threads} --summary {input} -o {output.folder} > {log} 2>&1
     """
