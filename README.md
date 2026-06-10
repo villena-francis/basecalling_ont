@@ -3,6 +3,7 @@
 ## Overview
 
 This Snakemake workflow processes Oxford Nanopore Technologies (ONT) raw reads (POD5 format) through basecalling and quality control.
+> This pipeline is based on the workflow originally developed by [@tdido](https://github.com/tdido) in [cnio-bu/myeloma-epi-sv](https://github.com/cnio-bu/myeloma-epi-sv).
 
 ## Features
 
