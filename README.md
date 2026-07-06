@@ -2,19 +2,21 @@
 
 ## Overview
 
-This Snakemake workflow processes Oxford Nanopore Technologies (ONT) raw reads (POD5 format) through basecalling and quality control.
+This Snakemake workflow processes Oxford Nanopore Technologies (ONT) raw reads (POD5 format) through basecalling and quality control, supporting both DNA and RNA sequencing data.
+
 > This pipeline is based on the workflow originally developed by [@tdido](https://github.com/tdido) in [cnio-bu/myeloma-epi-sv](https://github.com/cnio-bu/myeloma-epi-sv).
 
 ## Features
 
-- **Basecalling**: Uses Dorado for basecalling with modified base detection.
-- **Quality Control**: NanoPlot quality assessment from Dorado summary output.
+- **Basecalling**: Uses Dorado for basecalling with modified base detection
+- **Quality Control**: NanoPlot quality assessment from Dorado summary output
 
 ## Requirements
 
-- Snakemake (>=8.0)
+- Snakemake (>=9.0)
 - Conda or Mamba (for environment management)
-- CUDA-compatible GPU
+- CUDA-compatible GPU (required for Dorado basecalling)
+- [Dorado v2.0.1](https://github.com/nanoporetech/dorado/blob/v2.0.1/README.md#installation), downloaded manually (not managed via conda/mamba)
 
 ## Installation
 
@@ -27,19 +29,33 @@ cd basecalling_ont
 ```bash
 cp config/config.yaml.example config/config.yaml
 ```
-3. Edit the configuration file to match your environment, data locations, and analysis parameters.
+3. Download the Dorado binary (see [Requirements](#requirements))
+
+4. Edit the configuration file to match your environment, data locations, and analysis parameters
 
 ## Configuration
 
 The pipeline is configured through the `config/config.yaml` file, which includes:
 
-- **Reference files**: Paths to genome reference, annotations, and other required files
-- **Tool paths**: Locations of external tools like dorado and Clair3 models
-- **Analysis parameters**: Quality thresholds and analysis options
+- **Tool path**: Path to the downloaded Dorado binary (see [Requirements](#requirements))
+- **Analysis parameters**: Quality thresholds, basecalling model (see [Basecalling models](#basecalling-models) below), and other analysis options
 - **Samples structure**: Hierarchical organization of samples with associated metadata
 - **Resource specifications**: Resource allocation for different workflow steps
 
 See `config/config.yaml.example` for a detailed example of the configuration structure.
+
+### Basecalling models
+
+The Dorado model argument must be adjusted depending on the **type of sequencing data** and the modifications you wish to detect (see the [model list](https://software-docs.nanoporetech.com/dorado/latest/models/list/) for all available options).
+
+- Dorado **DNA** example model argument:
+```bash
+params_model: "sup,5mCG_5hmCG"
+```
+- Dorado **RNA** example model argument:
+```bash
+params_model: "sup,m6A_DRACH --estimate-poly-a"
+```
 
 ## Usage
 
@@ -54,7 +70,7 @@ snakemake --use-conda --cores <N>
 
 For cluster environments using Slurm:
 ```bash
-snakemake --use-conda --profile slurm
+snakemake --use-conda --executor slurm
 ```
 
 ## Pipeline Steps
